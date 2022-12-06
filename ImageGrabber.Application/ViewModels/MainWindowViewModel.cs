@@ -44,16 +44,16 @@ namespace ImageGrabber.Application.ViewModels
         }
 
         /// <summary>
-        /// camera source
+        /// camera resources
         /// </summary>
         public ObservableCollection<CombBoxData<ICamera>> CameraResources
         {
             get
             {
-                if (_model.CameraResource == null) return null;
+                if (_model.CameraResources == null) return null;
 
                 return new ObservableCollection<CombBoxData<ICamera>>(
-                    from camera in _model.CameraResource
+                    from camera in _model.CameraResources
                     select new CombBoxData<ICamera>(camera.Name, camera)
                 );
             }
@@ -78,26 +78,25 @@ namespace ImageGrabber.Application.ViewModels
         public bool StartGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (!Camera?.IsGrabbing ?? false));
         public bool StopGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (Camera?.IsGrabbing ?? false));
 
-
-        public ObservableCollection<GrabbedImageItem> ImageLists
-        {
-            get;
-        }
-
-        public Bitmap DisplayImage
-        {
-            get;set;
-        }
+        /// <summary>
+        /// grabbed image list 
+        /// </summary>
+        public ObservableCollection<GrabbedImageItem> ImageLists { get; }
+       
+        /// <summary>
+        /// current grabbed image
+        /// </summary>
+        public Bitmap DisplayImage { get; set; }
 
         #endregion
 
         #region DelegateCommand
 
         public DelegateCommand OpenCommand { get; }
-        public DelegateCommand CloseCommand { get;  }
-        public DelegateCommand StartGrabCommand { get;  }
-        public DelegateCommand StopGrabCommand { get;  }
-        public DelegateCommand SaveCommand { get;  }
+        public DelegateCommand CloseCommand { get; }
+        public DelegateCommand StartGrabCommand { get; }
+        public DelegateCommand StopGrabCommand { get; }
+        public DelegateCommand SaveCommand { get; }
 
         #endregion
 
@@ -172,8 +171,16 @@ namespace ImageGrabber.Application.ViewModels
         {
         }
 
-        private async void RelayOpenCommand() => await _model?.CameraOpen();
-        private async void RelayCloseCommand() => await _model?.CameraClose();
+        private async void RelayOpenCommand()
+        {
+            await _model?.CameraOpen();
+            this.InitiaBuffer();
+        }
+        private async void RelayCloseCommand()
+        {
+            await _model?.CameraClose();
+            this.InitiaBuffer();
+        }
         private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
         private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
         #endregion

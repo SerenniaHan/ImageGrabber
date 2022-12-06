@@ -15,69 +15,23 @@ using System.Windows.Controls.Primitives;
 
 namespace ImageGrabber.Application.Models
 {
-    public interface ICameraModel : INotifyPropertyChanged
-    {
-        IEnumerable<ICamera> CameraResource { get; }
-        ICamera Camera { get; set; }
-        bool IsOpen { get; }
-        bool IsGrabbing { get; }
-        GrabbedImageItem GrabbedImage { get; set; }
-        Task CameraOpen();
-        Task CameraClose();
-        Task CameraStartGrab();
-        Task CameraStopGrab();
-    }
-
-    public sealed class GrabbedImageItem
-    {
-        #region Properties
-
-        public string CameraName { get; private set; }
-        public string GrabbedTime { get; private set; }
-        public bool IsSelectedToSave { get; private set; }
-        public Bitmap Image { get; private set; }
-        public ImageSource ShowIamge { get; private set; }
-
-        #endregion
-
-        #region Constructor
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public GrabbedImageItem(string cameraName, string grabbedTime, bool isSelectedToSave, Bitmap image)
-        {
-            CameraName = cameraName;
-            GrabbedTime = grabbedTime;
-            IsSelectedToSave = isSelectedToSave;
-            Image = image;
-            ShowIamge = image.ToImageSource();
-        }
-
-        public GrabbedImageItem(GrabbedImageItem item)
-        {
-            this.CameraName = item.CameraName;
-            this.GrabbedTime = item.GrabbedTime;
-            this.IsSelectedToSave = item.IsSelectedToSave;
-            this.Image = item.Image;
-            this.ShowIamge = Image.ToImageSource();
-        }
-        #endregion
-    }
-
-    public class CameraItem : BindableBase, ICameraModel
+    /// <summary>
+    /// Defautl model object inherite from <see cref="ICameraModel"/>
+    /// </summary>
+    public sealed class CameraItem : BindableBase, ICameraModel
     {
 
         #region Private Fields
         private readonly ICameraManager _cameraManager;
         private ICamera _camera;
-        private int _flushTimeSpan = 1000;
-        private System.Timers.Timer _flushTimer;
+        private GrabbedImageItem _grabbedImageItem;
         #endregion
 
         #region Constructor
         /// <summary>
         /// Default Constructor
         /// </summary>
+        /// <remarks><see cref="ICameraManager"/> get from DI Contianer which is registed before</remarks>
         public CameraItem(ICameraManager cameraManager)
         {
             _cameraManager = cameraManager;
@@ -89,7 +43,7 @@ namespace ImageGrabber.Application.Models
 
         #region Properties
 
-        public IEnumerable<ICamera> CameraResource
+        public IEnumerable<ICamera> CameraResources
         {
             get
             {
@@ -102,9 +56,6 @@ namespace ImageGrabber.Application.Models
             }
         }
 
-        /// <summary>
-        /// Selected camera instance default value is set to null
-        /// </summary>
         public ICamera Camera
         {
             get => _camera;
@@ -115,31 +66,15 @@ namespace ImageGrabber.Application.Models
 
         public bool IsGrabbing => _camera?.IsGrabbing ?? false;
 
-        /// <summary>
-        /// Time span for flushing to videmodel
-        /// </summary>
-        public int FlushTimeSpan
-        {
-            get => _flushTimeSpan;
-            set => SetProperty(ref _flushTimeSpan, value);
-        }
-
-        private GrabbedImageItem _item;
         public GrabbedImageItem GrabbedImage
         {
-            get => _item;
-            set => SetProperty(ref _item, value);
+            get => _grabbedImageItem;
+            set => SetProperty(ref _grabbedImageItem, value);
         }
-
-        private Bitmap _img;
-        public Bitmap NewFrame
-        {
-            get => _img;
-            set => SetProperty(ref _img, value);
-        }
-
 
         #endregion
+
+        #region Public Methods
 
         public Task CameraOpen() => Task.Run(() =>
         {
@@ -168,6 +103,10 @@ namespace ImageGrabber.Application.Models
             RaisePropertyChanged(nameof(IsGrabbing));
         });
 
+        #endregion
+
+        #region Private Methods
+
         private void OnGrabbedImage(object sender, IGrabbedEvent e)
         {
             if (e.Image is Bitmap bmp)
@@ -175,5 +114,6 @@ namespace ImageGrabber.Application.Models
                 this.GrabbedImage = new GrabbedImageItem(e.Name, e.GrabbedTime.ToString(), false, bmp);
             }
         }
+        #endregion
     }
 }

@@ -12,11 +12,6 @@ namespace ImageGrabber.Core.Camera
             
         }
         
-        public DummyCamera(string name) : base(name)
-        {
-            
-        }
-
         public DummyCamera(string name, string description) : base(name, description)
         {
         }

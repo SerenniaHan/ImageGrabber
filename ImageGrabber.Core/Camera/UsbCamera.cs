@@ -28,11 +28,6 @@ namespace ImageGrabber.Core.Camera
         {
         }
 
-        public UsbCamera(string name) : base(name)
-        {
-
-        }
-
         /// <summary>
         /// Default Constructor
         /// </summary>

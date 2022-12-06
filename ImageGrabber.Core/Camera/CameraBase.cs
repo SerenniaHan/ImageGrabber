@@ -6,6 +6,9 @@ namespace ImageGrabber.Core.Camera
 {
     public delegate void GrabbedImageEventHandler(object sender, IGrabbedEvent e);
 
+    /// <summary>
+    /// Abstract camera base inherited from <see cref="ICamera"/> interface
+    /// </summary>
     public abstract class CameraBase : ICamera
     {
         #region DelegateCommand
@@ -35,10 +38,6 @@ namespace ImageGrabber.Core.Camera
             
         }
 
-        public CameraBase(string name)
-        {
-            this.Name = name;
-        }
         protected CameraBase(string name, string description)
         {
             this.Name = name;
@@ -46,7 +45,8 @@ namespace ImageGrabber.Core.Camera
         }
 
         #endregion
-        
+
+        #region Abstract Methods
         public abstract void Open();
         public abstract void Close();
         public abstract bool TryOpen();
@@ -56,5 +56,6 @@ namespace ImageGrabber.Core.Camera
         public abstract void SetParameters(Dictionary<string, object> dict);
         public abstract void StartGrab();
         public abstract void StopGrab();
+        #endregion
     }
 }
