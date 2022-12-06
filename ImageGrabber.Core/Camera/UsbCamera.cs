@@ -86,7 +86,7 @@ namespace ImageGrabber.Core.Camera
 #if NETCOREAPP3_1_OR_GREATER
             //framework problem
             _camera.SignalToStop();
-            //this.Close();
+            _camera.WaitForStop();
 #else
             _camera.Stop();
 #endif
