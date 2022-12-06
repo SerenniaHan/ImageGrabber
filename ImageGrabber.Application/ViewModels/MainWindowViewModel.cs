@@ -183,6 +183,19 @@ namespace ImageGrabber.Application.ViewModels
         }
         private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
         private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
+
+        /// <summary>
+        /// reset the views buffer when open and close done
+        /// </summary>
+        private void InitiaBuffer()
+        {
+            ImageLists?.Clear();
+            DisplayImage = null;
+
+            RaisePropertyChanged(nameof(ImageLists));
+            RaisePropertyChanged(nameof(DisplayImage));
+        }
+
         #endregion
     }
 }
