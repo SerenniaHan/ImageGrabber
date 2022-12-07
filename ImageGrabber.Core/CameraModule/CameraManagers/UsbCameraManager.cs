@@ -2,7 +2,7 @@
 using System.Linq;
 using AForge.Video.DirectShow;
 
-namespace ImageGrabber.Core.Camera;
+namespace ImageGrabber.Core.CameraModule;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 /// <summary>

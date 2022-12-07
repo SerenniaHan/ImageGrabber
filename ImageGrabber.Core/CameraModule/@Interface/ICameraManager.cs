@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ImageGrabber.Core.Camera;
+namespace ImageGrabber.Core.CameraModule;
 
 public interface ICameraManager
 {
