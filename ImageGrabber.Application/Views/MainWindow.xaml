@@ -12,48 +12,90 @@
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
-        Title="{Binding Title}" Height="700" Width="850"
+        Height="700" Width="850"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None" Background="Transparent"
+        WindowStyle="None"
+        ResizeMode="NoResize"
         >
 
+    <!--#region Window Resources-->
+    
     <Window.Resources>
 
         <!--#region converter-->
         <converter:ImageSourceConverter x:Key="BmpToImageSource"/>
         <!--#endregion-->
 
-        <Style x:Key="CommandButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+        <Style x:Key="CommandButton" TargetType="Button" 
+               BasedOn="{StaticResource MaterialDesignRaisedButton}">
             <Setter Property="Margin" Value="5 0"/>
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="40"/>
         </Style>
     </Window.Resources>
 
-    <Border Margin="10" CornerRadius="5" 
+    <!--#endregion-->
+    
+    <Border CornerRadius="20" 
             Background="{StaticResource MaterialDesignDarkBackground}">
 
-        <Grid>
+        <DockPanel LastChildFill="True">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <!-- #region Menu Bar -->
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <ComboBox Width="200"
+            <!--#region Window Title Bar-->
+            <DockPanel DockPanel.Dock="Top" LastChildFill="False"
+                       Height="40" 
+                       Background="{StaticResource MaterialDesignLightSeparatorBackground}"
+                       MouseLeftButtonDown="DockPanel_MouseLeftButtonDown"
+                       MouseLeftButtonUp="DockPanel_MouseLeftButtonUp"
+                       MouseMove="DockPanel_MouseMove">
+                <TextBlock DockPanel.Dock="Left" Margin="10 0 0 0"
+                           Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                           Foreground="White" FontWeight="SemiBold"
+                           TextAlignment="Left" VerticalAlignment="Center"
+                           Text="{Binding Title, FallbackValue=ImageGrabber}"/>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                            FlowDirection="LeftToRight" Margin="5">
+
+                    <Button Style="{StaticResource MinimizeButton}"
+                            Width="30" Height="30" Margin="5 0"
+                            Command="{Binding ApplicationMinimizeCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+
+                    <Button Style="{StaticResource CloseButton}"
+                            Width="30" Height="30" Margin="5 0"
+                            Command="{Binding ApplicationCloseCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"/>
+
+                </StackPanel>
+                
+            </DockPanel>
+            <!--#endregion-->
+            
+            <!--#region Main Region-->
+            
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- #region Menu Bar -->
+                <StackPanel Orientation="Horizontal" Margin="5" VerticalAlignment="Center" >
+                    <ComboBox Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                              Width="200" Padding="0 10"
                       ItemsSource="{Binding CameraResources, Mode=OneWay}"
                       DisplayMemberPath="DisplayMember"
                       SelectedValuePath="ValueMember"
                       SelectedValue="{Binding Camera}"/>
-                <Button Style="{StaticResource CommandButton}"
+                    <Button Style="{StaticResource CommandButton}"
                     Content="Open"
                     Command="{Binding OpenCommand}"/>
-                <Button Style="{StaticResource CommandButton}"
+                    <Button Style="{StaticResource CommandButton}"
                     Content="Close"
                     Command="{Binding CloseCommand}"/>
-                <Button Style="{StaticResource CommandButton}"
+                    <Button Style="{StaticResource CommandButton}"
                     Content="Start Grab"
                     Command="{Binding StartGrabCommand}"
                     materialDesign:ButtonProgressAssist.Value="-1"
@@ -61,48 +103,53 @@
                     materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding Camera.IsGrabbing}"
                     />
 
-                <Button Style="{StaticResource CommandButton}"
+                    <Button Style="{StaticResource CommandButton}"
                     Content="Stop Grab"
                     Command="{Binding StopGrabCommand}"/>
 
-                <Button Style="{StaticResource CommandButton}"
+                    <Button Style="{StaticResource CommandButton}"
                     Content="Save" 
                     Command="{Binding SaveCommand}"/>
-            </StackPanel>
-            <!-- #endregion -->
+                </StackPanel>
+                <!-- #endregion -->
 
-            <!-- #region Image Storage List -->
+                <!-- #region Image Storage List -->
 
-            <ListBox Grid.Row="1" 
+                <ListBox Grid.Row="1" 
                  ItemsSource="{Binding ImageLists, Mode=OneWay}"
                  SelectedItem="{Binding SelectedImageItem}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type model:GrabbedImageItem}">
-                        <DockPanel LastChildFill="True">
-                            <CheckBox Style="{StaticResource ButtonAppearanceCheckBox}"
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type model:GrabbedImageItem}">
+                            <DockPanel LastChildFill="True">
+                                <CheckBox Style="{StaticResource ButtonAppearanceCheckBox}"
                                   DockPanel.Dock="Top" IsChecked="{Binding IsSelectedToSave}"
                                   Content="{Binding GrabbedTime}"/>
-                            <Image Width="150" Source="{Binding ShowImage}" 
+                                <Image Width="150" Height="150" Source="{Binding ShowImage}" 
                                Stretch="Uniform"/>
-                        </DockPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-            <!-- #endregion -->
+                <!-- #endregion -->
 
-            <!-- #region Current Image Show -->
-            <Image Grid.Row="2" Margin="20"
-               Source="{Binding DisplayImage, Converter={StaticResource BmpToImageSource}}"
-               Width="600" Height="600"
-               Stretch="Uniform"/>
-            <!-- #endregion -->
+                <!-- #region Current Image Show -->
+                <Image Grid.Row="2" Margin="20"
+                       Source="{Binding DisplayImage, Converter={StaticResource BmpToImageSource}}"
+                       Width="500" Height="500"
+                       Stretch="Fill"/>
+                <!-- #endregion -->
 
-        </Grid>
+            </Grid>
+            
+            <!--#endregion-->
+
+        </DockPanel>
+        
     </Border>
 </Window>
