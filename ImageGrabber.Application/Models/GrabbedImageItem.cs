@@ -64,7 +64,25 @@ namespace ImageGrabber.Application.Models
             this.GrabbedTime = item.GrabbedTime;
             this.IsSelectedToSave = item.IsSelectedToSave;
             this.Image = item.Image;
-            this.ShowIamge = Image.ToImageSource();
+            this.ShowImage = Image.ToImageSource();
+        }
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// save image
+        /// </summary>
+        public void Save()
+        {
+            if (false == Directory.Exists($@"./out")) Directory.CreateDirectory(@$"./out");
+
+            using (var fileStream = new FileStream($@"./out/{CameraName}_{DateTime.Parse(GrabbedTime):yyyyMMddHHmmssfff}.bmp", FileMode.CreateNew))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(ShowImage as BitmapSource));
+                encoder.Save(fileStream);
+            }
         }
         #endregion
     }
