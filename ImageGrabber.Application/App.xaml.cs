@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Unity;
 using Prism.Ioc;
-using ImageGrabber.Core.Camera;
+using ImageGrabber.Core.CameraModule;
 using ImageGrabber.Application.Views;
 using ImageGrabber.Application.Models;
 
