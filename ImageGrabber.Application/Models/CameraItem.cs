@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Drawing;
 using Prism.Mvvm;
 using ImageGrabber.Core;
 using ImageGrabber.Core.Camera;
-using System.Drawing;
-using System.Collections.Concurrent;
-using System.ComponentModel;
-using System.Timers;
-using System.Windows.Media;
-using ImageGrabber.Wpf.Extensions;
-using System.Windows.Controls.Primitives;
 
 namespace ImageGrabber.Application.Models
 {
     /// <summary>
-    /// Defautl model object inherite from <see cref="ICameraModel"/>
+    /// Default model object inherited from <see cref="ICameraModel"/>
     /// </summary>
     public sealed class CameraItem : BindableBase, ICameraModel
     {

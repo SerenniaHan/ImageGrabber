@@ -18,8 +18,6 @@ namespace ImageGrabber.Core.Camera
 
         #region Properties
 
-
-
         #endregion
 
         #region Constructor
@@ -64,6 +62,7 @@ namespace ImageGrabber.Core.Camera
         }
 
         public override bool ContinuousGrabbingMode { get; set; }
+
         public override void SetTriggerMode()
         {
         }
@@ -90,7 +89,6 @@ namespace ImageGrabber.Core.Camera
 #else
             _camera.Stop();
 #endif
-
         }
 
         private void OnNewFrameGrabbed(object sender, NewFrameEventArgs e)

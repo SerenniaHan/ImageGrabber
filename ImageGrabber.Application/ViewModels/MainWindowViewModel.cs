@@ -1,20 +1,16 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Media;
-using ImageGrabber.Application.Models;
+using System.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
+using ImageGrabber.Application.Models;
 using ImageGrabber.Core.Camera;
 using ImageGrabber.Wpf.Extensions;
 using ImageGrabber.Wpf.Utility;
-using System.Windows.Navigation;
-using System.ComponentModel;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Windows;
-using System.Collections.Concurrent;
-using System.Drawing;
+
 
 namespace ImageGrabber.Application.ViewModels
 {
@@ -24,9 +20,10 @@ namespace ImageGrabber.Application.ViewModels
     {
         #region Private Fields
 
-        private string _title = "Image Grabber Application";
+        private readonly string _title = "Image Grabber Application";
         private readonly ICameraModel _model;
-
+        private GrabbedImageItem _selectedImageItem;
+        private readonly ManualResetEvent _signalToFlush;
         #endregion
 
         #region Properties
@@ -34,14 +31,7 @@ namespace ImageGrabber.Application.ViewModels
         /// <summary>
         /// Window Title
         /// </summary>
-        public string Title
-        {
-            get
-            {
-                if (_model?.Camera is null) return _title;
-                else return $"{_title}_[{_model.Camera.Name}]";
-            }
-        }
+        public string Title => _model?.Camera is null ? _title : $"{_title}_[{_model.Camera.Name}]";
 
         /// <summary>
         /// camera resources
@@ -78,11 +68,36 @@ namespace ImageGrabber.Application.ViewModels
         public bool StartGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (!Camera?.IsGrabbing ?? false));
         public bool StopGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (Camera?.IsGrabbing ?? false));
 
+        public bool IsSaveCommandCanBeExecute => SelectedImageItem != null;
+
         /// <summary>
         /// grabbed image list 
         /// </summary>
         public ObservableCollection<GrabbedImageItem> ImageLists { get; }
-       
+
+        /// <summary>
+        /// selected image item
+        /// </summary>
+        public GrabbedImageItem SelectedImageItem
+        {
+            get => _selectedImageItem;
+            set
+            {
+                if (_selectedImageItem != null) _selectedImageItem.IsSelectedToSave = false;
+
+                if (SetProperty(ref _selectedImageItem, value))
+                {
+                    _selectedImageItem.IsSelectedToSave = true;
+                    if (_signalToFlush.WaitOne(1))
+                    {
+                        _signalToFlush.Reset();
+                    }
+
+                    RaisePropertyChanged(nameof(IsSaveCommandCanBeExecute));
+                }
+            }
+        }
+
         /// <summary>
         /// current grabbed image
         /// </summary>
@@ -112,12 +127,19 @@ namespace ImageGrabber.Application.ViewModels
             _model = model;
             _model.PropertyChanged += ModelPropertyChanged;
 
+            //create a signal instance for pause the flush behavior
+            _signalToFlush = new ManualResetEvent(false);
+            //set this as default 
+            _signalToFlush.Set();
+
             ImageLists = new ObservableCollection<GrabbedImageItem>();
 
             OpenCommand = new DelegateCommand(RelayOpenCommand, () => OpenCommandCanBeExecute).ObservesProperty(() => OpenCommandCanBeExecute);
             CloseCommand = new DelegateCommand(RelayCloseCommand, () => CloseCommandCanBeExecute).ObservesProperty(() => CloseCommandCanBeExecute);
             StartGrabCommand = new DelegateCommand(RelayStartGrabCommand, () => StartGrabCommandCanBeExecute).ObservesProperty(() => StartGrabCommandCanBeExecute);
             StopGrabCommand = new DelegateCommand(RelayStopGrabCommand, () => StopGrabCommandCanBeExecute).ObservesProperty(() => StopGrabCommandCanBeExecute);
+
+            SaveCommand = new DelegateCommand(RelaySaveCommand, () => IsSaveCommandCanBeExecute).ObservesProperty(() => IsSaveCommandCanBeExecute);
         }
 
 
@@ -151,11 +173,18 @@ namespace ImageGrabber.Application.ViewModels
                     {
                         var image = new GrabbedImageItem(_model.GrabbedImage);
 
-                        while (ImageLists.Count() > 4) ImageLists.RemoveAt(0);
-                        ImageLists.Add(image);
+
                         DisplayImage = image.Image;
-                        RaisePropertyChanged(nameof(ImageLists));
                         RaisePropertyChanged(nameof(DisplayImage));
+
+                        //check the signal status before raise property changed
+                        if (_signalToFlush.WaitOne(1))
+                        {
+                            while (ImageLists.Count() > 4) ImageLists.RemoveAt(0);
+                            ImageLists.Add(image);
+                            RaisePropertyChanged(nameof(ImageLists));
+                        }
+
                     }).SafeInvoke();
                     break;
 
@@ -167,19 +196,27 @@ namespace ImageGrabber.Application.ViewModels
 
         #region Private Methods
 
-        private void SaveExecute()
+        private void RelaySaveCommand()
         {
+            _selectedImageItem.Save();
+            if (!_signalToFlush.WaitOne(1))
+                _signalToFlush.Set();
+
+            _selectedImageItem = null;
+
+            RaisePropertyChanged(nameof(IsSaveCommandCanBeExecute));
+
         }
 
         private async void RelayOpenCommand()
         {
             await _model?.CameraOpen();
-            this.InitiaBuffer();
+            this.ClearBuffer();
         }
         private async void RelayCloseCommand()
         {
             await _model?.CameraClose();
-            this.InitiaBuffer();
+            this.ClearBuffer();
         }
         private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
         private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
@@ -187,7 +224,7 @@ namespace ImageGrabber.Application.ViewModels
         /// <summary>
         /// reset the views buffer when open and close done
         /// </summary>
-        private void InitiaBuffer()
+        private void ClearBuffer()
         {
             ImageLists?.Clear();
             DisplayImage = null;

@@ -1,17 +1,47 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using ImageGrabber.Wpf.Extensions;
+using Prism.Mvvm;
 
 namespace ImageGrabber.Application.Models
 {
-    public class GrabbedImageItem
+    /// <summary>
+    /// grabbed image item object
+    /// </summary>
+    public class GrabbedImageItem : BindableBase
     {
+        #region Private Fileds
+        private bool _isSelectedToSave;
+        #endregion
+
         #region Properties
+        /// <summary>
+        /// camera name
+        /// </summary>
         public string CameraName { get; private set; }
+        /// <summary>
+        /// grabbed time
+        /// </summary>
         public string GrabbedTime { get; private set; }
-        public bool IsSelectedToSave { get; private set; }
+        /// <summary>
+        /// if this item is selected from view then return <see langword="true"/>, otherwise return <see langword="false"/>
+        /// </summary>
+        public bool IsSelectedToSave
+        {
+            get => _isSelectedToSave;
+            set => SetProperty(ref _isSelectedToSave, value);
+        }
+        /// <summary>
+        /// grabbed image
+        /// </summary>
         public Bitmap Image { get; private set; }
-        public ImageSource ShowIamge { get; private set; }
+        /// <summary>
+        /// convert bitmap to image source for showing in the view controller
+        /// </summary>
+        public ImageSource ShowImage { get; private set; }
 
         #endregion
 
@@ -25,7 +55,7 @@ namespace ImageGrabber.Application.Models
             GrabbedTime = grabbedTime;
             IsSelectedToSave = isSelectedToSave;
             Image = image;
-            ShowIamge = image.ToImageSource();
+            ShowImage = image.ToImageSource();
         }
 
         public GrabbedImageItem(GrabbedImageItem item)
