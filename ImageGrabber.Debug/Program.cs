@@ -1,25 +1,8 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
-using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿namespace ImageGrabber.Debug;
 
-namespace ImageGrabber.Debug
+class Program
 {
-    class Sample<T>
+    static void Main(string[] args)
     {
-        public delegate void GenericEventHandler<T>(object sender, T eventArgs);
-
-        public event GenericEventHandler<T> OnGenericEvent;
-    }
-
-    class Program
-    {
-        static void Main(string[] args)
-        {
-        }
     }
 }
