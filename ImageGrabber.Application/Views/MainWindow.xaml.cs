@@ -24,5 +24,31 @@ namespace ImageGrabber.Application.Views
         {
             InitializeComponent();
         }
+        private bool _isMouseDown = false;
+
+        private void DockPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _isMouseDown = true;
+            this.DragMove();
+        }
+
+        private void DockPanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _isMouseDown = false;
+        }
+
+        private void DockPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isMouseDown && this.WindowState == System.Windows.WindowState.Maximized)
+            {
+                _isMouseDown = false;
+                this.WindowState = System.Windows.WindowState.Normal;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
