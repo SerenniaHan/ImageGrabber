@@ -149,7 +149,10 @@ public class MainWindowViewModel : BindableBase
 
         SaveCommand = new DelegateCommand(RelaySaveCommand, () => IsSaveCommandCanBeExecute).ObservesProperty(() => IsSaveCommandCanBeExecute);
 
+        ApplicationMinimizeCommand = new DelegateCommand<object>(RelayMinimizeCommand);
 
+        ApplicationCloseCommand = new DelegateCommand<object>(RelayCloseCommand);
+    }
 
     #endregion
 
@@ -215,26 +218,47 @@ public class MainWindowViewModel : BindableBase
 
     }
 
-        private async void RelayOpenCommand()
-        {
-            await _model?.CameraOpen();
-            this.ClearBuffer();
-        }
-        private async void RelayCloseCommand()
-        {
-            await _model?.CameraClose();
-            this.ClearBuffer();
-        }
-        private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
-        private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
+    private async void RelayOpenCommand()
+    {
+        await _model?.CameraOpen();
+        this.ClearBuffer();
+    }
+    private async void RelayCloseCommand()
+    {
+        await _model?.CameraClose();
+        this.ClearBuffer();
+    }
+    private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
+    private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
 
-        /// <summary>
-        /// reset the views buffer when open and close done
-        /// </summary>
-        private void ClearBuffer()
+    private void RelayMinimizeCommand(object sender)
+    {
+        if (sender is System.Windows.Window window)
         {
-            ImageLists?.Clear();
-            DisplayImage = null;
+            window.WindowState = System.Windows.WindowState.Minimized;
+        }
+    }
+
+    private void RelayCloseCommand(object sender)
+    {
+        if (sender is System.Windows.Window window)
+        {
+            if(_model.Camera?.IsGrabbing ?? false)
+            {
+                _model.Camera.StopGrab();
+                _model.Camera.Close();
+            }
+            window.Close();
+        }
+    }
+
+    /// <summary>
+    /// reset the views buffer when open and close done
+    /// </summary>
+    private void ClearBuffer()
+    {
+        ImageLists?.Clear();
+        DisplayImage = null;
 
         RaisePropertyChanged(nameof(ImageLists));
         RaisePropertyChanged(nameof(DisplayImage));
