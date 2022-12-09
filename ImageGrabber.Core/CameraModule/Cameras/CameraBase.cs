@@ -24,6 +24,7 @@ public abstract class CameraBase : ICamera
     public string Description { get; set; }
     public bool IsOpen { get; set; }
     public bool IsGrabbing { get; set; }
+    public ECameraRotateType RotateType { get; set; }
 
     #endregion
 
@@ -38,6 +39,7 @@ public abstract class CameraBase : ICamera
     {
         this.Name = name;
         this.Description = description;
+        this.RotateType = ECameraRotateType.RotateNone;
     }
 
     #endregion
@@ -53,4 +55,12 @@ public abstract class CameraBase : ICamera
     public abstract void StartGrab();
     public abstract void StopGrab();
     #endregion
+
+    #region Public Methods
+    public void SetRotation(ECameraRotateType rotateType)
+    {
+        this.RotateType = rotateType;
+    }
+    #endregion
+
 }

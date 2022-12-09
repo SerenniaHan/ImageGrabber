@@ -93,8 +93,18 @@ public class UsbCamera : CameraBase
 
     private void OnNewFrameGrabbed(object sender, NewFrameEventArgs e)
     {
-        e.Frame.RotateFlip(System.Drawing.RotateFlipType.Rotate90FlipY);
-
+        e.Frame.RotateFlip(UsbCamera.ToRotateFlipType(this.RotateType));
         base.OnGrabbedImageChanged(new BitmapGrabbedEvent($"{this.Name}", DateTime.Now, e.Frame));
+    }
+
+    private static System.Drawing.RotateFlipType ToRotateFlipType(ECameraRotateType rotateType)
+    {
+        return rotateType switch
+        {
+            ECameraRotateType.Rotate90 => System.Drawing.RotateFlipType.Rotate90FlipNone,
+            ECameraRotateType.Rotate180 => System.Drawing.RotateFlipType.Rotate180FlipNone,
+            ECameraRotateType.Rotate270 => System.Drawing.RotateFlipType.Rotate270FlipNone,
+            _ => System.Drawing.RotateFlipType.RotateNoneFlipNone
+        };
     }
 }

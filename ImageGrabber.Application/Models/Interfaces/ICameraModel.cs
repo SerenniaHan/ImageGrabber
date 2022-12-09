@@ -8,7 +8,7 @@ namespace ImageGrabber.Application.Models;
 /// <summary>
 /// ICameraModel provides the generic interface for implement model object
 /// </summary>
-public interface ICameraModel : INotifyPropertyChanged
+public interface ICameraModel : INotifyPropertyChanged, IEnumerator<ECameraRotateType>
 {
     /// <summary>
     /// camera resources gets from <see cref="ICameraManager"/> object
@@ -46,4 +46,8 @@ public interface ICameraModel : INotifyPropertyChanged
     /// camera stop grabbing image task
     /// </summary>
     Task CameraStopGrab();
+    /// <summary>
+    /// set rotate type
+    /// </summary>
+    void SetRotateType();
 }

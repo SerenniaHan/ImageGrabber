@@ -67,7 +67,7 @@ public class MainWindowViewModel : BindableBase
     public bool CloseCommandCanBeExecute => Camera?.IsOpen ?? false;
     public bool StartGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (!Camera?.IsGrabbing ?? false));
     public bool StopGrabCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (Camera?.IsGrabbing ?? false));
-
+    public bool IsRotateCommandCanBeExecute => ((Camera?.IsOpen ?? false) && (Camera?.IsGrabbing ?? false));
     public bool IsSaveCommandCanBeExecute => SelectedImageItem != null;
 
     /// <summary>
@@ -114,7 +114,7 @@ public class MainWindowViewModel : BindableBase
     public DelegateCommand StartGrabCommand { get; }
     public DelegateCommand StopGrabCommand { get; }
     public DelegateCommand SaveCommand { get; }
-
+    public DelegateCommand RotateImageCommand { get; }
     public DelegateCommand<object> ApplicationMinimizeCommand { get; }
     public DelegateCommand<object> ApplicationCloseCommand { get; }
 
@@ -149,6 +149,8 @@ public class MainWindowViewModel : BindableBase
 
         SaveCommand = new DelegateCommand(RelaySaveCommand, () => IsSaveCommandCanBeExecute).ObservesProperty(() => IsSaveCommandCanBeExecute);
 
+        RotateImageCommand = new DelegateCommand(RelayRotateImageCommand,  ()=> IsRotateCommandCanBeExecute).ObservesProperty(() => IsRotateCommandCanBeExecute);
+
         ApplicationMinimizeCommand = new DelegateCommand<object>(RelayMinimizeCommand);
 
         ApplicationCloseCommand = new DelegateCommand<object>(RelayCloseCommand);
@@ -175,6 +177,7 @@ public class MainWindowViewModel : BindableBase
                 RaisePropertyChanged(nameof(CloseCommandCanBeExecute));
                 RaisePropertyChanged(nameof(StartGrabCommandCanBeExecute));
                 RaisePropertyChanged(nameof(StopGrabCommandCanBeExecute));
+                RaisePropertyChanged(nameof(IsRotateCommandCanBeExecute));
                 break;
 
             case nameof(ICameraModel.GrabbedImage):
@@ -230,7 +233,10 @@ public class MainWindowViewModel : BindableBase
     }
     private async void RelayStartGrabCommand() => await _model.CameraStartGrab();
     private async void RelayStopGrabCommand() => await _model.CameraStopGrab();
-
+    private void RelayRotateImageCommand()
+    {
+        _model.SetRotateType();
+    }
     private void RelayMinimizeCommand(object sender)
     {
         if (sender is System.Windows.Window window)

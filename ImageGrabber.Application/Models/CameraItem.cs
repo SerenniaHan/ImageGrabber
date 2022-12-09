@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Collections;
 using Prism.Mvvm;
 using ImageGrabber.Core.CameraModule;
 
@@ -67,6 +68,46 @@ public sealed class CameraItem : BindableBase, ICameraModel
 
     #endregion
 
+    #region IEnumerator Implementation
+    private readonly ECameraRotateType[] _rotateTypeList = new ECameraRotateType[]
+    {
+        ECameraRotateType.Rotate90,
+        ECameraRotateType.Rotate180,
+        ECameraRotateType.Rotate270,
+        ECameraRotateType.RotateNone
+    };
+    private int _index = -1;
+    public ECameraRotateType Current => _rotateTypeList[_index];
+
+    object IEnumerator.Current => _rotateTypeList[_index];
+
+    public bool MoveNext()
+    {
+        _index++;
+
+        if(_index > _rotateTypeList.Length - 1)
+        {
+            _index = 0;
+        }
+
+
+        System.Console.WriteLine($"INDEX {{{_index}}}");
+
+        return true;
+    }
+
+    public void Reset()
+    {
+        _index = -1;
+    }
+
+    public void Dispose()
+    {
+        
+    }
+    #endregion
+
+
     #region Public Methods
 
     public Task CameraOpen() => Task.Run(() =>
@@ -96,17 +137,24 @@ public sealed class CameraItem : BindableBase, ICameraModel
         RaisePropertyChanged(nameof(IsGrabbing));
     });
 
+    public void SetRotateType()
+    {
+        this.MoveNext();
+        _camera.SetRotation(Current);
+    }
     #endregion
 
     #region Private Methods
 
     private void OnGrabbedImage(object sender, IGrabbedEvent e)
     {
-        if(e is { Image: Bitmap bmp})
+        if (e is { Image: Bitmap bmp })
         {
             this.GrabbedImage = new GrabbedImageItem(e.Name, e.GrabbedTime.ToString(), false, bmp);
         }
     }
+
+
 
     #endregion
 }

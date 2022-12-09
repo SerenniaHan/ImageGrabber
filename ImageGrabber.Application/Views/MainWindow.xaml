@@ -117,6 +117,10 @@
                     <Button Style="{StaticResource CommandButton}"
                     Content="Save" 
                     Command="{Binding SaveCommand}"/>
+
+                    <Button Height="40"
+                            Content="{materialDesign:PackIcon Kind=RotateRight}"
+                            Command="{Binding RotateImageCommand}"/>
                 </StackPanel>
                 <!-- #endregion -->
 

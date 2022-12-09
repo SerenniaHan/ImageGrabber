@@ -20,6 +20,10 @@ public interface ICamera : IDevice, IDisposable
     /// </summary>
     string Description { get; set; }
     /// <summary>
+    /// iamge rotation
+    /// </summary>
+    ECameraRotateType RotateType { get; set; }
+    /// <summary>
     /// if camera is grabbing then return <see langword="true"/>, otherwise return <see langword="false"/>
     /// </summary>
     bool IsGrabbing { get; set; }
@@ -29,6 +33,7 @@ public interface ICamera : IDevice, IDisposable
     bool ContinuousGrabbingMode { get; set; }
     void SetTriggerMode();
     void SetParameters(Dictionary<string, object> dict);
+    void SetRotation(ECameraRotateType rotateType);
     /// <summary>
     /// camera start grab
     /// </summary>
