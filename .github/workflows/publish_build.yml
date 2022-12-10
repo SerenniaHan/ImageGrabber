@@ -33,4 +33,4 @@ jobs:
     - name: Move to artifact
       uses: actions/upload-artifact@v3
       with:
-        path: ${{ github.workspace }}\ImageGrabber.Application\**
+        path: ${{ github.workspace }}\ImageGrabber.Application\bin\**
