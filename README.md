@@ -4,6 +4,8 @@
 
 This is a self practice project about using usb camere device for grabb and display image.
 
+[![Publish Build](https://github.com/SerenniaHan/ImageGrabber/actions/workflows/publish_build.yml/badge.svg)](https://github.com/SerenniaHan/ImageGrabber/actions/workflows/publish_build.yml)
+
 ## Required Environment
 
 * Windows OS
