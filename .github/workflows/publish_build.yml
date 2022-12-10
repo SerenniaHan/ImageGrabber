@@ -1,23 +1,31 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
 name: Publish Build
 
 on:
   push:
-    branches: [" master "]
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
   build:
+
     runs-on: windows-latest
+
     steps:
+    
     - name: Checkout
-      uses: actions\checkout@v3
-      
-    - name: Install .Net
+      uses: actions/checkout@v3
+    
+    - name: Install .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-        
+    
     - name: Restore dependencies
-      run: dotnet resotre
-      
-    - name: Build project
-      run: dotnet build --no-resotre --configuration Release
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
