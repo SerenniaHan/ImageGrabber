@@ -1,0 +1,23 @@
+name: Publish Build
+
+on:
+  push:
+    branches: [" master "]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions\checkout@v3
+      
+    - name: Install .Net
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet resotre
+      
+    - name: Build project
+      run: dotnet build --no-resotre --configuration Release
