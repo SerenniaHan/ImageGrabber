@@ -29,3 +29,8 @@ jobs:
     
     - name: Build
       run: dotnet build --no-restore --configuration Release
+      
+    - name: Move to artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: ${{ github.workspace }}\ImageGrabber.Application\**
