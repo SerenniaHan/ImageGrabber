@@ -48,6 +48,7 @@ public class UsbCamera : CameraBase
     {
         base.Close();
         if (_camera == null) return;
+        if (this.IsGrabbing) { this.StopGrab(); }
         _camera = null;
     }
 
