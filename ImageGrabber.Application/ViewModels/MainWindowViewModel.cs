@@ -4,13 +4,13 @@ using System.Drawing;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Prism.Commands;
 using Prism.Mvvm;
 using ImageGrabber.Application.Models;
 using ImageGrabber.Core.CameraModule;
 using ImageGrabber.Wpf.Extensions;
 using ImageGrabber.Wpf.Utility;
-
 
 namespace ImageGrabber.Application.ViewModels;
 
@@ -149,7 +149,7 @@ public class MainWindowViewModel : BindableBase
 
         SaveCommand = new DelegateCommand(RelaySaveCommand, () => IsSaveCommandCanBeExecute).ObservesProperty(() => IsSaveCommandCanBeExecute);
 
-        RotateImageCommand = new DelegateCommand(RelayRotateImageCommand,  ()=> IsRotateCommandCanBeExecute).ObservesProperty(() => IsRotateCommandCanBeExecute);
+        RotateImageCommand = new DelegateCommand(RelayRotateImageCommand, () => IsRotateCommandCanBeExecute).ObservesProperty(() => IsRotateCommandCanBeExecute);
 
         ApplicationMinimizeCommand = new DelegateCommand<object>(RelayMinimizeCommand);
 
@@ -245,15 +245,19 @@ public class MainWindowViewModel : BindableBase
         }
     }
 
-    private void RelayCloseCommand(object sender)
+    private async void RelayCloseCommand(object sender)
     {
-        if (sender is System.Windows.Window window)
+        await Task.Run(() =>
         {
-            if(_model.Camera?.IsGrabbing ?? false)
+            if (_model.Camera?.IsGrabbing ?? false)
             {
                 _model.Camera.StopGrab();
                 _model.Camera.Close();
             }
+        });
+
+        if (sender is System.Windows.Window window)
+        {
             window.Close();
         }
     }
