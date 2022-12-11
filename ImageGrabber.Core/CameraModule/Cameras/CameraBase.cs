@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ImageGrabber.Core.CameraModule;
 
@@ -45,15 +46,26 @@ public abstract class CameraBase : ICamera
     #endregion
 
     #region Abstract Methods
+    public abstract bool ContinuousGrabbingMode { get; set; }
+
     public abstract void Open();
-    public abstract void Close();
+    public virtual void Close()
+    {
+        IsOpen = false;
+        RotateType = ECameraRotateType.RotateNone;
+    }
     public abstract bool TryOpen();
     public abstract void Dispose();
-    public abstract bool ContinuousGrabbingMode { get; set; }
     public abstract void SetTriggerMode();
     public abstract void SetParameters(Dictionary<string, object> dict);
-    public abstract void StartGrab();
-    public abstract void StopGrab();
+    public virtual void StartGrab()
+    {
+        IsGrabbing = true;
+    }
+    public virtual void StopGrab()
+    {
+        IsGrabbing = false;
+    }
     #endregion
 
     #region Public Methods

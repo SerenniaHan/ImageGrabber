@@ -46,7 +46,7 @@ public class UsbCamera : CameraBase
 
     public override void Close()
     {
-        IsOpen = false;
+        base.Close();
         if (_camera == null) return;
         _camera = null;
     }
@@ -73,14 +73,14 @@ public class UsbCamera : CameraBase
 
     public override void StartGrab()
     {
-        IsGrabbing = true;
+        base.StartGrab();
         _camera.NewFrame += OnNewFrameGrabbed;
         _camera.Start();
     }
 
     public override void StopGrab()
     {
-        IsGrabbing = false;
+        base.StopGrab();
         _camera.NewFrame -= OnNewFrameGrabbed;
 #if NETCOREAPP3_1_OR_GREATER
         //framework problem
