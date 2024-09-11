@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Image Grabber","text":""},{"location":"#about-this-project","title":"About this project","text":"<p>[!NOTE] This is a self practice project about using usb camera device for grab and display image.</p>"},{"location":"#how-to-use-it","title":"How to use it","text":""}]}
